@@ -2,7 +2,8 @@ const db = require("../db/connection");
 const app = require("../app");
 const request = require("supertest");
 const data = require("../db/data/test-data")
-const seed = require("../db/seeds/seed")
+const seed = require("../db/seeds/seed");
+// const { forEach } = require("../db/data/test-data/articles");
 
 beforeEach(() => {
     return seed(data);
@@ -81,6 +82,40 @@ describe ("GET: /api/articles/:article_id", () => {
     });
 });
 
+describe ("GET: /api/users", () => {
+    test ("return status code 200", () => {
+        return request(app).get("/api/users").expect(200);
+    });
+    test ("return object with key of users", () => {
+        return request(app).get("/api/users").expect(200)
+        .then(({body})=> {
+            expect(Object.keys(body)).toEqual(['users']);
+        });
+    });
+    test ("return object with array of users", () => {
+        return request(app).get("/api/users").expect(200)
+        .then(({body})=> {
+            const output = data.userData
+            expect(body.users.length).toEqual(4)
+            expect(body.users).toEqual(output);
+        });
+    });
+    test ("return object with array of users of correct data types", () => {
+        return request(app).get("/api/users").expect(200)
+        .then(({body})=> {
+            const userArr = body.users
+            expect(body.users.length).toEqual(4)
+            userArr.forEach((user) => {
+                expect(user.username).toEqual(expect.any(String));
+                expect(user.name).toEqual(expect.any(String));
+                expect(user.avatar_url).toEqual(expect.any(String));
+            });
+        });
+    });
+});
+
+////////////////////////// PATCH /////////////////////////////
+
 describe ("PATCH: /api/articles/:article_id", () => {
     test ("returns status 200", () => {
         const updatedVote = { inc_votes : 3 }
@@ -139,7 +174,6 @@ describe ("PATCH: /api/articles/:article_id", () => {
 
 describe ("error handling", () => {
     test ("ALL:returns a 404 with msg when unknown route", () =>{
-        const incVotes = {inc_votes : 1}
         return request(app).get("/api/not-a-route").then(({body}) => {
             expect(body.msg).toBe('route not found :(');
         });

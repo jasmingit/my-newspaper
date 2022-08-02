@@ -1,6 +1,6 @@
-const { fetchTopics, fetchArticleById, updateArticleById } = require("../model/newpaper");
+const { fetchTopics, fetchArticleById, updateArticleById, fetchUsers } = require("../model/newpaper");
 
-exports.getTopics = (req, res) => {
+exports.getTopics = (req, res, next) => {
     fetchTopics().then((topicArr) => {
         res.status(200).send({topics : topicArr});        
     })
@@ -22,8 +22,14 @@ exports.patchArticleById = (req, res, next) => {
         res.status(400).send({ msg: 'bad request D:<' })
     };
     updateArticleById(newVotes, articleId).then((article)=> {
-        // console.log(article, "<--- updated article")
         res.status(200).send({updatedArticle: article});
     })
     .catch((err) => next(err))
+};
+
+exports.getUsers = (req, res, next) => {
+    fetchUsers().then((users) => {
+       res.status(200).send({ users : users}); 
+    })
+    .catch((err) => next(err));
 };
