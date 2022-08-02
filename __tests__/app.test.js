@@ -107,14 +107,14 @@ describe ("PATCH: /api/articles/:article_id", () => {
             expect(updatedArticle.votes).toBe(3);
         });
     });
-    test ("updates the vote key with newVote (10)", () => {
-        const updatedVote = { inc_votes : 10 }
+    test ("updates the vote key with negative newVote (-10)", () => {
+        const updatedVote = { inc_votes : -10 }
         return request(app).patch("/api/articles/2")
         .send(updatedVote)
         .expect(200)
         .then(({body}) => {
             const updatedArticle = body['updatedArticle']
-            expect(updatedArticle.votes).toBe(10);
+            expect(updatedArticle.votes).toBe(-10);
         });
     });
     test ("all keys/columns return correct data types", () => {
