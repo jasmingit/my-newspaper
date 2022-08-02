@@ -1,4 +1,3 @@
-// const db = require("./db/connection")
 const express = require("express");
 const app = express();
 const { getTopics, getArticleById } = require("./controller/newspaper");
@@ -20,3 +19,4 @@ app.use(handleServerErrors);
 
 
 module.exports = app;
+
