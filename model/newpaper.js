@@ -13,7 +13,23 @@ exports.fetchArticleById = (articleId) => {
         if(article.length === 0) {
             return Promise.reject({status: 404, msg: 'article not found'});
         };
-        return rows[0];
+        return article[0];
+    });
+};
+
+exports.updateArticleById = (newVotes, articleId) => {
+    return db.query(
+       `UPDATE articles 
+        SET votes = votes + $1 
+        WHERE article_id = $2
+        RETURNING *;`, 
+        [newVotes, articleId])
+
+    .then(({ rows : article}) => {
+        if(article.length === 0) {
+            return Promise.reject({status: 404, msg: 'article not found'});
+        };
+        return article[0]
     });
 };
     
