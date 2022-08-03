@@ -32,4 +32,15 @@ exports.updateArticleById = (newVotes, articleId) => {
         return article[0]
     });
 };
+
+exports.fetchUsers = () => {
+    return db.query(
+        `SELECT * FROM users;`
+    ).then(({rows : users}) => {
+        if(users.length === 0) {
+            return Promise.reject({status: 404, msg: 'no users found'});
+        };
+        return users;
+    })
+}
     
