@@ -77,3 +77,17 @@ exports.fetchUsers = () => {
     });
 };
     
+exports.insertCommentById = (newComment, articleId) => {
+    let comment = [newComment.body, articleId, newComment.author, newComment.votes];
+
+    return db.query(
+        `INSERT INTO comments
+        (body, article_id, author, votes)
+        VALUES 
+        ($1, $2, $3, $4)
+        RETURNING *;`, comment
+    ).then(({rows : comments})=> {
+        console.log(comments)
+    })
+    
+}
