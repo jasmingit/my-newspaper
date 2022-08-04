@@ -36,19 +36,6 @@ exports.fetchArticleById = (articleId) => {
     });
 };
 
-exports.commentCountArticle = (article) => {
-    const articleObj = article
-    const articleId = articleObj.article_id
-    return db.query(
-        `SELECT * FROM comments
-        WHERE article_id = $1;`, [articleId])
-        .then(({body}) => {
-            console.log(body)
-        });
-};
-
-
-
 exports.updateArticleById = (newVotes, articleId) => {
     return db.query(
        `UPDATE articles 

@@ -9,7 +9,6 @@ exports.getTopics = (req, res, next) => {
 
 exports.getArticles = (req, res, next) => {
     fetchArticles().then((articlesArr) => {
-        console.log(articlesArr, "<======== articles array !")
         res.status(200).send({articles : articlesArr});
     })
     .catch((err) => next(err));
@@ -18,7 +17,7 @@ exports.getArticles = (req, res, next) => {
 exports.getArticleById = (req, res, next) => {
     const articleId = req.params['article_id'];
     fetchArticleById(articleId).then((article)=> {
-       res.status(200).send({articles: article});
+       res.status(200).send({article: article});
     })
     .catch((err) => next(err));
 };
@@ -30,7 +29,8 @@ exports.patchArticleById = (req, res, next) => {
         res.status(400).send({ msg: 'bad request D:<' })
     };
     updateArticleById(newVotes, articleId).then((article)=> {
-        res.status(200).send({updatedArticle: article});
+        // console.log(article, "<========= ")
+        res.status(200).send({article: article});
     })
     .catch((err) => next(err))
 };
