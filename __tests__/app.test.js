@@ -13,6 +13,18 @@ beforeEach(() => {
     return db.end();
   });  
 
+describe.only ("GET: /api/articles", () => {
+    test ("return status 200", () => {
+        return request(app).get("/api/articles").expect(200);
+    });
+    test ("return object with key of articles", () => {
+        return request(app).get("/api/articles").expect(200)
+        .then(({body}) => {
+            expect(body.hasOwnProperty('articles')).toBe(true)
+        });
+    });
+});
+
 describe ("GET: /api/topics", () => {
     test ("recieve status 200", () => {
         return request(app).get("/api/topics").expect(200);
@@ -253,5 +265,5 @@ describe ("error handling", () => {
 
             expect(body.msg).toBe('bad request D:<')
         });
-    })
+    });
 });
