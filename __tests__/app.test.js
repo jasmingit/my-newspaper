@@ -52,18 +52,19 @@ describe ("GET: /api/articles/:article_id", () => {
     });
     test ("return object with key of article with matching article id", () => {
         const articleId = 2;
-
+        
         return request(app).get(`/api/articles/${articleId}`).then(({body}) => {
-            expect(body.article).toEqual(articleId2);
+            const article = body.article
+            expect(article.article_id).toEqual(articleId2.article_id);
         });
     });
     test ("object value must contain all the columns as keys", () => {
         const articleId = 2;
-        const output = ['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'];
+        const output = ['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'comment_count'];
 
         return request(app).get(`/api/articles/${articleId}`).then(({body}) => {
             expect(Object.keys(body.article)).toEqual(output);
-            expect(Object.keys(body['article'])).toHaveLength(7);
+            expect(Object.keys(body['article'])).toHaveLength(8);
         });
     });
     test ("all keys/columns return correct data types", () => {
@@ -78,6 +79,34 @@ describe ("GET: /api/articles/:article_id", () => {
             expect(article.body).toEqual(expect.any(String));
             expect(article.created_at).toEqual(expect.any(String));
             expect(article.votes).toEqual(expect.any(Number));
+            expect(article.comment_count).toEqual(expect.any(Number));
+        });
+    });
+
+    describe("GET: /api/articles/:article_id - comment_count", () => {
+        test ("send status 200", () => {
+            return request(app).get("/api/articles/2").expect(200);
+        });
+        test ("comment count object recieved", () => {
+            return request(app).get("/api/articles/2").expect(200)
+            .then(({body}) => {
+                const article = body.article
+                expect(article.hasOwnProperty('comment_count')).toBe(true)
+            });
+        });
+        test ("comment count is correct - article_id = 1", () => {
+            return request(app).get("/api/articles/1").expect(200)
+            .then(({body}) => {
+                const article = body.article
+                expect(article.comment_count).toBe(11)
+            });
+        });
+        test ("comment count is correct - article_id = 9", () => {
+            return request(app).get("/api/articles/9").expect(200)
+            .then(({body}) => {
+                const article = body.article
+                expect(article.comment_count).toBe(2)
+            });
         });
     });
 });
@@ -113,6 +142,8 @@ describe ("GET: /api/users", () => {
         });
     });
 });
+
+
 
 ////////////////////////// PATCH /////////////////////////////
 
