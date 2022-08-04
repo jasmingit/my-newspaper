@@ -14,6 +14,27 @@ beforeEach(() => {
   });  
 
 describe ("GET: /api/articles", () => {
+    const firstDate = {
+        article_id: 3,
+        title: 'Eight pug gifs that remind me of mitch',
+        topic: 'mitch',
+        author: 'icellusedkars',
+        body: 'some gifs',
+        created_at: '2020-11-03T09:12:00.000Z',
+        votes: 0,
+        comment_count: 2
+      }
+    const lastDate = {
+        article_id: 7,
+        title: 'Z',
+        topic: 'mitch',
+        author: 'icellusedkars',
+        body: 'I was hungry.',
+        created_at: '2020-01-07T14:08:00.000Z',
+        votes: 0,
+        comment_count: 0
+      }
+
     test ("return status 200", () => {
         return request(app).get("/api/articles").expect(200);
     });
@@ -23,21 +44,21 @@ describe ("GET: /api/articles", () => {
             expect(body.hasOwnProperty('articles')).toBe(true)
         });
     });
-    // test ("array of articles ordered by date(created_at) FIRST DESC", () => {
-    //     return request(app).get("/api/articles").expect(200)
-    //     .then(({body}) => {
-    //         const articles = body.articles
-    //         expect(articles[0]).toEqual(firstDate)
-    //     });
-    // })
-    // test ("array of articles ordered by date(created_at) LAST DESC", () => {
-    //     return request(app).get("/api/articles").expect(200)
-    //     .then(({body}) => {
-    //         const articles = body.articles
-    //         const lastindex =  articles.length -1
-    //         expect(articles[lastindex]).toEqual(lastDate)
-    //     });
-    // });
+    test ("array of articles ordered by date(created_at) FIRST DESC", () => {
+        return request(app).get("/api/articles").expect(200)
+        .then(({body}) => {
+            const articles = body.articles
+            expect(articles[0]).toEqual(firstDate)
+        });
+    })
+    test ("array of articles ordered by date(created_at) LAST DESC", () => {
+        return request(app).get("/api/articles").expect(200)
+        .then(({body}) => {
+            const articles = body.articles
+            const lastindex =  articles.length -1
+            expect(articles[lastindex]).toEqual(lastDate)
+        });
+    });
 });
 
 describe ("GET: /api/topics", () => {
