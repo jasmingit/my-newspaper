@@ -23,6 +23,21 @@ describe ("GET: /api/articles", () => {
             expect(body.hasOwnProperty('articles')).toBe(true)
         });
     });
+    test ("array of articles ordered by date(created_at) FIRST DESC", () => {
+        return request(app).get("/api/articles").expect(200)
+        .then(({body}) => {
+            const articles = body.articles
+            expect(articles[0]).toEqual(firstDate)
+        });
+    })
+    test ("array of articles ordered by date(created_at) LAST DESC", () => {
+        return request(app).get("/api/articles").expect(200)
+        .then(({body}) => {
+            const articles = body.articles
+            const lastindex =  articles.length -1
+            expect(articles[lastindex]).toEqual(lastDate)
+        });
+    })
 });
 
 describe ("GET: /api/topics", () => {
