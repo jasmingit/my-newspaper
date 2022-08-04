@@ -13,6 +13,18 @@ beforeEach(() => {
     return db.end();
   });  
 
+describe ("GET: /api/articles", () => {
+    test ("return status 200", () => {
+        return request(app).get("/api/articles").expect(200);
+    });
+    test ("return object with key of articles", () => {
+        return request(app).get("/api/articles").expect(200)
+        .then(({body}) => {
+            expect(body.hasOwnProperty('articles')).toBe(true)
+        });
+    });
+});
+
 describe ("GET: /api/topics", () => {
     test ("recieve status 200", () => {
         return request(app).get("/api/topics").expect(200);
@@ -83,7 +95,7 @@ describe ("GET: /api/articles/:article_id", () => {
         });
     });
 
-    describe("GET: /api/articles/:article_id - comment_count", () => {
+    describe ("GET: /api/articles/:article_id - comment_count", () => {
         test ("send status 200", () => {
             return request(app).get("/api/articles/2").expect(200);
         });
@@ -160,7 +172,7 @@ describe ("PATCH: /api/articles/:article_id", () => {
         .expect(200)
         .send(updatedVote)
         .then(({body}) => {
-            expect(Object.keys(body)).toEqual(['updatedArticle'])
+            expect(Object.keys(body)).toEqual(['article'])
         })
     });
     test ("updates the vote key with newVote (3)", () => {
@@ -169,7 +181,8 @@ describe ("PATCH: /api/articles/:article_id", () => {
         .send(updatedVote)
         .expect(200)
         .then(({body}) => {
-            const updatedArticle = body['updatedArticle']
+            
+            const updatedArticle = body.article
             expect(updatedArticle.votes).toBe(3);
         });
     });
@@ -179,7 +192,7 @@ describe ("PATCH: /api/articles/:article_id", () => {
         .send(updatedVote)
         .expect(200)
         .then(({body}) => {
-            const updatedArticle = body['updatedArticle']
+            const updatedArticle = body.article
             expect(updatedArticle.votes).toBe(-10);
         });
     });
@@ -253,5 +266,5 @@ describe ("error handling", () => {
 
             expect(body.msg).toBe('bad request D:<')
         });
-    })
+    });
 });
