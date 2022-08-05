@@ -4,7 +4,6 @@ const request = require("supertest");
 const data = require("../db/data/test-data")
 const seed = require("../db/seeds/seed");
 
-
 beforeEach(() => {
     return seed(data);
   });
@@ -58,7 +57,7 @@ describe ("GET: /api/articles", () => {
             const lastindex =  articles.length -1
             expect(articles[lastindex]).toEqual(lastDate)
         });
-    });
+
 });
 
 describe ("GET: /api/topics", () => {
