@@ -88,6 +88,5 @@ exports.insertCommentById = (newComment, articleId) => {
         RETURNING *;`, comment
     ).then(({rows : comments})=> {
         console.log(comments)
-    })
-    
-}
+    });
+};

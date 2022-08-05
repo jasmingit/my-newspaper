@@ -410,8 +410,8 @@ describe ("error handling", () => {
         .expect(400)
         .send(updatedVote)
         .then(({body}) => {
-
-            expect(body.msg).toBe('bad request D:<')
+             expect(body.msg).toBe('bad request D:<')
         });
     });
+});
 });
