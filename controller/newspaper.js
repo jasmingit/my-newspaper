@@ -9,6 +9,7 @@ exports.getTopics = (req, res, next) => {
 
 exports.getArticles = (req, res, next) => {
     fetchArticles().then((articlesArr) => {
+        // console.log(articlesArr, "<----- articles")
         res.status(200).send({articles : articlesArr});
     })
     .catch((err) => next(err));
