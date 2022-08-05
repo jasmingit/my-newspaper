@@ -5,6 +5,9 @@ exports.handleCustomErrors = (err, req, res, next) => {
     if(err.status === 404) {
         res.status(404).send({msg : 'article not found'})
     }
+    if(err.code === '23503') {
+        res.status(400).send({msg : 'bad request grrr'})
+    }
     next(err)
 };
 

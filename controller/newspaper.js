@@ -56,6 +56,7 @@ exports.postCommentById = (req, res, next) => {
     const newComment = req.body;
     const body = newComment['body'];
     const author = newComment['author'];
+    
     fetchArticleById(articleId).then(() => {
         return insertCommentById(articleId, body, author)
         })
