@@ -52,9 +52,15 @@ exports.patchArticleById = (req, res, next) => {
 };
 
 exports.postCommentById = (req, res, next) => {
-    const articleId = req.params['article_id']
-    const newComment = req.body
-    insertCommentById(newComment, articleId).then(({comment}) => {
-        res.status(201).send({comment : comment});
-    });
+    const articleId  = req.params['article_id'];
+    const newComment = req.body;
+    const body = newComment['body'];
+    const author = newComment['author'];
+    fetchArticleById(articleId).then(() => {
+        return insertCommentById(articleId, body, author)
+        })
+        .then((comment) => {
+            res.status(201).send({ comment : comment});
+    })
+    .catch((err) => next(err))
 };

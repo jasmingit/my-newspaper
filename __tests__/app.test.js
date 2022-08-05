@@ -337,28 +337,35 @@ describe ("PATCH: /api/articles/:article_id", () => {
 
 ////////////////////////// POST ////////////////////////////
 
-// describe ("POST: /api/articles/:article_id/comments", () => {
-//     const newComment = {
-//         body: "I am a bunch of mumbo jumbo!",
-//         author: 'jasmin_baddister',
-//         votes: 100,
-//       }
-//     test ("returns status 201", () => {
-//         const articleId = 5
-//         return request(app).post(`/api/articles/${articleId}/comments`)
-//         .expect(201);
-//     });
-//     test ("returns status 201", () => {
-//         const articleId = 5
-//         return request(app).post(`/api/articles/${articleId}/comments`)
-//         .send(newComment)
-//         .then(({body}) => {
-//             const comments = data.commentData
-//             expect(body.msg).toBe("comment added")
-//             expect(comments.length).toBe(19)
-//         })
-//     });
-// });
+describe ("POST: /api/articles/:article_id/comments", () => {
+    const newComment = {
+        body: "I am a bunch of mumbo jumbo!",
+        author: "butter_bridge"
+      }
+    test ("returns status 201", () => {
+        const articleId = 5
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .expect(201)
+        .send(newComment)
+    });
+    test ("returns msg with comment added", () => {
+        const articleId = 5
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .send(newComment)
+        .then(({body}) => {
+            const comments = data.commentData
+            const newComment = body['comment'][0]
+            console.log(newComment)
+            expect(newComment['comment_id']).toBe(19);
+            expect(newComment['body']).toBe("I am a bunch of mumbo jumbo!");
+            expect(newComment['article_id']).toBe(5);
+            expect(newComment['author']).toBe("butter_bridge");
+            expect(newComment['votes']).toBe(0);
+            expect(newComment['created_at']).toEqual(expect.any(String));
+            expect(comments.length).toBe(18);
+        });
+    });
+});
 
 
 ///////////////////////////////////////////////////////
