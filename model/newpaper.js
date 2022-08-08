@@ -1,4 +1,4 @@
-const db = require("../db/connection")
+const db = require("../db/connection");
 
 exports.fetchTopics = () => {
     return db.query("SELECT * FROM topics;")
@@ -36,6 +36,20 @@ exports.fetchArticleById = (articleId) => {
     });
 };
 
+exports.fetchCommentsById = (articleId) => {
+    return db.query(
+        `SELECT * FROM comments
+        WHERE comments.article_id = $1;`,
+        [articleId])
+        .then(({rows : comments}) => {
+        if(comments.length === 0) {
+            return Promise.reject({status: 404, msg: 'comment not found'});
+        };
+        // console.log(comments, "<---comments--<<<")
+        return comments;
+    });
+};
+
 exports.updateArticleById = (newVotes, articleId) => {
     return db.query(
        `UPDATE articles 
@@ -63,3 +77,14 @@ exports.fetchUsers = () => {
     });
 };
     
+exports.insertCommentById = (articleId, body, author) => {
+    return db.query(
+        `INSERT INTO comments
+        (article_id, body, author)
+        VALUES 
+        ($1, $2, $3)
+        RETURNING *;`, [articleId, body, author]
+    ).then(({rows : newComment})=> {
+        return newComment
+    });
+};

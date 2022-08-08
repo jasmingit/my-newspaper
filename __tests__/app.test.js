@@ -4,8 +4,6 @@ const request = require("supertest");
 const data = require("../db/data/test-data")
 const seed = require("../db/seeds/seed");
 
-// const { forEach } = require("../db/data/test-data/articles");
-
 beforeEach(() => {
     return seed(data);
   });
@@ -35,6 +33,7 @@ describe ("GET: /api/articles", () => {
         votes: 0,
         comment_count: 0
       }
+
     test ("return status 200", () => {
         return request(app).get("/api/articles").expect(200);
     });
@@ -58,7 +57,7 @@ describe ("GET: /api/articles", () => {
             const lastindex =  articles.length -1
             expect(articles[lastindex]).toEqual(lastDate)
         });
-    })
+
 });
 
 describe ("GET: /api/topics", () => {
@@ -157,6 +156,94 @@ describe ("GET: /api/articles/:article_id", () => {
             });
         });
     });
+
+    describe ("GET: /api/articles/:article_id/comments", () => {
+        test ("get status 200", () => {
+            const articleId = 5
+            return request(app).get(`/api/articles/${articleId}/comments`).expect(200);
+        });
+        test ("return object with key of comments", () => {
+            const articleId = 5
+            return request(app).get(`/api/articles/${articleId}/comments`)
+            .expect(200)
+            .then(({body}) => {
+                expect(Object.keys(body)).toEqual(['comments']);
+            });
+        });
+        test ("returns comments with the given article_id", () => {
+            const articleId = 5
+            const commentsWithId5 = [
+                {
+                  comment_id: 14,
+                  body: 'What do you see? I have no idea where this will lead us. This place I speak of, is known as the Black Lodge.',
+                  article_id: 5,
+                  author: 'icellusedkars',
+                  votes: 16,
+                  created_at: '2020-06-09T05:00:00.000Z'
+                },
+                {
+                  comment_id: 15,
+                  body: "I am 100% sure that we're not completely sure.",
+                  article_id: 5,
+                  author: 'butter_bridge',
+                  votes: 1,
+                  created_at: '2020-11-24T00:08:00.000Z'
+                }
+              ];
+            return request(app)
+            .get(`/api/articles/${articleId}/comments`)
+            .expect(200)
+            .then(({body}) => {
+                expect(body.comments.length).toBe(2)
+                expect(body.comments).toEqual(commentsWithId5);
+            });
+        });
+        test ("returns comments with the given article_id", () => {
+            const articleId = 9
+            const commentsWithId9 = [
+                {
+                  comment_id: 1,
+                  body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                  article_id: 9,
+                  author: 'butter_bridge',
+                  votes: 16,
+                  created_at: '2020-04-06T12:17:00.000Z'
+                },
+                {
+                  comment_id: 17,
+                  body: 'The owls are not what they seem.',
+                  article_id: 9,
+                  author: 'icellusedkars',
+                  votes: 20,
+                  created_at: '2020-03-14T17:02:00.000Z'
+                }
+              ];
+            return request(app)
+            .get(`/api/articles/${articleId}/comments`)
+            .expect(200)
+            .then(({body}) => {
+                expect(body.comments.length).toBe(2)
+                expect(body.comments).toEqual(commentsWithId9);
+            });
+        });
+        test ("comment objects have correct data types", () => {
+            const articleId = 9
+              return request(app)
+              .get(`/api/articles/${articleId}/comments`)
+              .expect(200)
+              .then(({body}) => {
+                const commentArr = body.comments
+                commentArr.forEach((comment) => {
+                  expect(comment.comment_id).toEqual(expect.any(Number));
+                  expect(comment.body).toEqual(expect.any(String));
+                  expect(comment.article_id).toEqual(expect.any(Number));
+                  expect(comment.author).toEqual(expect.any(String));
+                  expect(comment.votes).toEqual(expect.any(Number));
+                  expect(comment.created_at).toEqual(expect.any(String));
+                });
+              });
+        });
+    });
 });
 
 describe ("GET: /api/users", () => {
@@ -190,8 +277,6 @@ describe ("GET: /api/users", () => {
         });
     });
 });
-
-
 
 ////////////////////////// PATCH /////////////////////////////
 
@@ -250,6 +335,39 @@ describe ("PATCH: /api/articles/:article_id", () => {
     });
 });
 
+////////////////////////// POST ////////////////////////////
+
+describe ("POST: /api/articles/:article_id/comments", () => {
+    const newComment = {
+        body: "I am a bunch of mumbo jumbo!",
+        author: "butter_bridge"
+      }
+    test ("returns status 201", () => {
+        const articleId = 5
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .expect(201)
+        .send(newComment)
+    });
+    test ("returns msg with comment added", () => {
+        const articleId = 5
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .send(newComment)
+        .then(({body}) => {
+            const comments = data.commentData
+            const newComment = body['comment'][0]
+
+            expect(newComment['comment_id']).toBe(19);
+            expect(newComment['body']).toBe("I am a bunch of mumbo jumbo!");
+            expect(newComment['article_id']).toBe(5);
+            expect(newComment['author']).toBe("butter_bridge");
+            expect(newComment['votes']).toBe(0);
+            expect(newComment['created_at']).toEqual(expect.any(String));
+            expect(comments.length).toBe(18);
+        });
+    });
+});
+
+
 ///////////////////////////////////////////////////////
 
 describe ("error handling", () => {
@@ -299,8 +417,52 @@ describe ("error handling", () => {
         .expect(400)
         .send(updatedVote)
         .then(({body}) => {
-
-            expect(body.msg).toBe('bad request D:<')
+             expect(body.msg).toBe('bad request D:<')
         });
     });
+
+    const newComment = {
+        body: "I am a bunch of mumbo jumbo!",
+        author: "jasmin_baddister"
+      }
+
+    test ("POST: /api/articles/100/comments - article id does not exist - 404", () => {
+        const articleId = 100
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .expect(404)
+        .send(newComment)
+        .then(({body}) => {
+            expect(body.msg).toBe('article not found');
+        });
+    });
+    // test ("POST: /api/articles/5/comments - body does not have all keys - 400", () => {
+    //     const articleId = 100
+    //     const badComment = { body: "I am a bunch of mumbo jumbo!" }
+    //     return request(app).post(`/api/articles/${articleId}/comments`)
+    //     .expect(400)
+    //     .send(badComment)
+    //     .then(({body}) => {
+    //         console.log(body)
+    //         expect(body.msg).toBe('bad request D:<');
+    //     });
+    // });
+    test ("POST: /api/articles/not-a-num/comments - article id is not a number- 400", () => {
+        const articleId = "not a num"
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .expect(400)
+        .send(newComment)
+        .then(({body}) => {
+            expect(body.msg).toBe('bad request D:<');
+        });
+    });
+    test ("POST: /api/articles/5/comments - author does not exist (username) - 400", () => {
+        const articleId = 5
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .expect(400)
+        .send(newComment)
+        .then(({body}) => {
+            expect(body.msg).toBe('bad request grrr');
+        });
+    });
+});
 });
