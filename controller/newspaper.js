@@ -1,4 +1,11 @@
-const { fetchTopics, fetchArticleById, updateArticleById, fetchUsers, fetchArticles, fetchCommentsById } = require("../model/newpaper");
+const { fetchTopics, fetchArticleById, updateArticleById, fetchUsers, fetchArticles, fetchCommentsById, insertCommentById } = require("../model/newpaper");
+
+exports.getUsers = (req, res, next) => {
+    fetchUsers().then((users) => {
+       res.status(200).send({ users : users}); 
+    })
+    .catch((err) => next(err));
+};
 
 exports.getTopics = (req, res, next) => {
     fetchTopics().then((topicArr) => {
@@ -44,9 +51,17 @@ exports.patchArticleById = (req, res, next) => {
     .catch((err) => next(err))
 };
 
-exports.getUsers = (req, res, next) => {
-    fetchUsers().then((users) => {
-       res.status(200).send({ users : users}); 
+exports.postCommentById = (req, res, next) => {
+    const articleId  = req.params['article_id'];
+    const newComment = req.body;
+    const body = newComment['body'];
+    const author = newComment['author'];
+    
+    fetchArticleById(articleId).then(() => {
+        return insertCommentById(articleId, body, author)
+        })
+        .then((comment) => {
+            res.status(201).send({ comment : comment});
     })
-    .catch((err) => next(err));
+    .catch((err) => next(err))
 };

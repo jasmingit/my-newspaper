@@ -61,9 +61,11 @@ describe ("GET: /api/articles", () => {
             expect(articles[lastindex]).toEqual(lastDate)
         });
 
+
     });
 
     })
+
 
 });
 
@@ -342,6 +344,39 @@ describe ("PATCH: /api/articles/:article_id", () => {
     });
 });
 
+////////////////////////// POST ////////////////////////////
+
+describe ("POST: /api/articles/:article_id/comments", () => {
+    const newComment = {
+        body: "I am a bunch of mumbo jumbo!",
+        author: "butter_bridge"
+      }
+    test ("returns status 201", () => {
+        const articleId = 5
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .expect(201)
+        .send(newComment)
+    });
+    test ("returns msg with comment added", () => {
+        const articleId = 5
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .send(newComment)
+        .then(({body}) => {
+            const comments = data.commentData
+            const newComment = body['comment'][0]
+
+            expect(newComment['comment_id']).toBe(19);
+            expect(newComment['body']).toBe("I am a bunch of mumbo jumbo!");
+            expect(newComment['article_id']).toBe(5);
+            expect(newComment['author']).toBe("butter_bridge");
+            expect(newComment['votes']).toBe(0);
+            expect(newComment['created_at']).toEqual(expect.any(String));
+            expect(comments.length).toBe(18);
+        });
+    });
+});
+
+
 ///////////////////////////////////////////////////////
 
 describe ("error handling", () => {
@@ -391,8 +426,52 @@ describe ("error handling", () => {
         .expect(400)
         .send(updatedVote)
         .then(({body}) => {
-
-            expect(body.msg).toBe('bad request D:<')
+             expect(body.msg).toBe('bad request D:<')
         });
     });
+
+    const newComment = {
+        body: "I am a bunch of mumbo jumbo!",
+        author: "jasmin_baddister"
+      }
+
+    test ("POST: /api/articles/100/comments - article id does not exist - 404", () => {
+        const articleId = 100
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .expect(404)
+        .send(newComment)
+        .then(({body}) => {
+            expect(body.msg).toBe('article not found');
+        });
+    });
+    // test ("POST: /api/articles/5/comments - body does not have all keys - 400", () => {
+    //     const articleId = 100
+    //     const badComment = { body: "I am a bunch of mumbo jumbo!" }
+    //     return request(app).post(`/api/articles/${articleId}/comments`)
+    //     .expect(400)
+    //     .send(badComment)
+    //     .then(({body}) => {
+    //         console.log(body)
+    //         expect(body.msg).toBe('bad request D:<');
+    //     });
+    // });
+    test ("POST: /api/articles/not-a-num/comments - article id is not a number- 400", () => {
+        const articleId = "not a num"
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .expect(400)
+        .send(newComment)
+        .then(({body}) => {
+            expect(body.msg).toBe('bad request D:<');
+        });
+    });
+    test ("POST: /api/articles/5/comments - author does not exist (username) - 400", () => {
+        const articleId = 5
+        return request(app).post(`/api/articles/${articleId}/comments`)
+        .expect(400)
+        .send(newComment)
+        .then(({body}) => {
+            expect(body.msg).toBe('bad request grrr');
+        });
+    });
+});
 });

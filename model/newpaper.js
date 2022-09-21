@@ -1,4 +1,4 @@
-const db = require("../db/connection")
+const db = require("../db/connection");
 
 exports.fetchTopics = () => {
     return db.query("SELECT * FROM topics;")
@@ -77,3 +77,14 @@ exports.fetchUsers = () => {
     });
 };
     
+exports.insertCommentById = (articleId, body, author) => {
+    return db.query(
+        `INSERT INTO comments
+        (article_id, body, author)
+        VALUES 
+        ($1, $2, $3)
+        RETURNING *;`, [articleId, body, author]
+    ).then(({rows : newComment})=> {
+        return newComment
+    });
+};
